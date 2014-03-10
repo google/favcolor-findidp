@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -f ae.go
+cp ae.go.fake ae.go
+chmod -w ae.go
+clear
+/usr/local/go/bin/go test 

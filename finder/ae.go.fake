@@ -1,0 +1,65 @@
+package findIDP
+
+import (
+	"net/http"
+	"os"
+	"strings"
+)
+
+func getHandles(r *http.Request) Handles {
+	return Handles{getDatabase(r), getLogger(r), getClient(r)}
+}
+
+func getClient(_ *http.Request) *http.Client {
+	return http.DefaultClient
+}
+
+func getLogger(_ *http.Request) Logger {
+	return FakeLogger{make([]string, 0), make([]string, 0)}
+}
+
+type FakeLogger struct {
+	errors []string
+	debugs []string
+}
+
+func (l FakeLogger) logError(s string) {
+	// fmt.Fprintf(os.Stderr, "FindIDP ERROR %s\n", s)
+	l.errors = append(l.errors, s)
+}
+func (l FakeLogger) logDebug(s string) {
+	// fmt.Printf("FindIDP DEBUG %s\n", s)
+	l.debugs = append(l.debugs, s)
+}
+
+type FakeDatabase map[string]string
+
+func getDatabase(_ *http.Request) Database {
+	db := make(FakeDatabase)
+	for _, e := range os.Environ() {
+		parts := strings.Split(e, "=")
+		if strings.HasPrefix(parts[0], "FIND_IDP_") {
+			key := parts[0]
+			key = key[len("FIND_IDP_"):]
+			db[key] = parts[1]
+		}
+	}
+	return db
+}
+
+func (f FakeDatabase) storeEMail(email *EMail) error {
+	os.Setenv("FIND_IDP_"+email.string(), string(email.IDPs[0].Key))
+	return nil
+}
+
+func (f FakeDatabase) getEMail(address string) (e *EMail) {
+	value := f[address]
+	if value == "" {
+		return nil
+	} else {
+		email, _ := parseEMail(address)
+		email.IDPs = []IDP{*wellKnownIDP(IDPKey(value))}
+		return email
+	}
+	return nil
+}

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -f ae.go
+cp ae.go.real ae.go
+chmod -w ae.go
+clear
+cd ../.. && dev_appserver.py findIDP/

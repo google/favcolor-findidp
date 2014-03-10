@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <title>IDP Finder Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="web/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="web/fi.css" rel="stylesheet" media="screen">
+
+    </head>
+  <body>
+    <div class="row-fluid">
+      <div id="box" class="span8 offset2">
+	<div class="row-fluid">
+	  <div class="span12">
+	      <p>Recommended IDP for <b>{{.EMail}}</b> 
+		is <b>{{.IDP}}</b> {{.Verified}}
+	      </p>
+	      <form action="/report">
+		<p>Try another search: 
+		  <input id="m" class="input-medium" name="m" placeholder="email" style="width: 20em;" />
+		  <button class="btn" type="Submit" value="look again">look again</button>
+		</p>
+	      </form>
+	    <hr />
+	    <div class="crumbs">
+	      <p>The recommendation is based on these heuristics:</p>
+	      <table cellpadding="5" cellspacing="2">
+		<tr><th align="left">Method</th><th align="left">Suggestion</th><th align="right">Strength</th><th align="right">Verified?</th></tr>
+		{{range .Crumbs}}
+		<tr align="right"><td align="left">{{.Method}}</td><td align="left">{{.IDPs}}</td><td>{{.Strength}}</td><td>{{.Verified}}</td></tr>
+		{{end}}
+	      </table>
+	    </div>
+	    <hr/>
+	    <div class="h4">
+	      <form method="post" action="/set">
+		<input type="hidden" name="e" value="{{.EMail}}" />
+		<p>You can set the IDP for <b>{{.EMail}}</b> [Doesn't work yet].</p>
+		  <p>Either pick from the list of 
+		    <select name="i">
+		      <option value="-">Well-known IDPs</option>
+		      <option value="F">Facebook</option>
+		      <option value="G">Google</option>
+		      <option value="M">Microsoft</option>
+		      <option value="Y">Yahoo</option>
+		    </select> or<br/>
+		    Enter a URI
+		    <input id="iu" class="input-medium" name="iu" placeholder="URI" style="width: 20em;" />
+		    and protocol:
+		    <select name="p">
+		      <option value="?">I don&rsquo;t know (perfectly OK)</option>
+		      <option value="oidc">OpenID Connect</option>
+		      <option value="oid2">OpenID 2</option>
+		      <option value="persona">Mozilla Persona</option>
+		      <option value="saml">SAML</option>
+		    </select>
+		    <br/>
+  		    <button class="btn" type="Submit" value="Go!">Set IDP</button>
+		  </p>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="web/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>
